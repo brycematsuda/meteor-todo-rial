@@ -7,14 +7,16 @@
     <header>
       <h1>Todo(-rial) List</h1>
 
+      <p>Paste raw m3u file in the text box below.</p>
+      <p>Then hit "Parse M3U" to import songs into the manager.</p>
       <form class="m3u-parse">
       <textarea name="textarea" rows="10" cols="75"></textarea>
         <button type="submit">Parse M3U</button>
       </form>
-
+<!-- 
       <form class="new-task">
         <input type="text" name="text" placeholder="Type to add new tasks" />
-      </form>
+      </form> -->
     </header>
 
     <ul>
@@ -31,6 +33,8 @@
 
     <input type="checkbox" checked="{{checked}}" class="toggle-checked" />
 
-    <span class="text">{{text}}</span>
+    <span class="text">{{text}}</span> <span class="marked">{{#if checked}}Marked for deletion.{{/if}}</span>
+    <br><span class="text">File location: {{rawFileLoc}}</span>
+    <br><span class="text">Raw extinf: {{rawExtInf}}</span>
   </li>
 </template>

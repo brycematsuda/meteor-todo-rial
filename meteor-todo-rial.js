@@ -26,26 +26,33 @@ if (Meteor.isClient) {
     return false;
   },
   "submit .m3u-parse": function (event) {
-    
     // Get textarea value, and filter out only the "#EXTINF" with song information.
-    var parseText = event.target.textarea.value.split("\n");
+    var parseText = event.target.textarea.value;
+    var parseTrimLength = parseText.trim().length;
 
-    var songArray = jQuery.grep(parseText, function( n ) {
-      return (n.substr(0, 7) == "#EXTINF");
-    });
+    if (!parseText){
+      if (parseTrimLength > 0){ // Check for empty input
+        var parseTextArray = parseText.split("\n");
+        var songArray = jQuery.grep(parseTextArray, function(n) {
+          return (n !== "#EXTM3U");
+        });
 
-    // Insert list of songs into task list.
-    var i = 0;
-    for (i = 0; i < songArray.length; i++){
+        // Insert list of songs into task list.
+        var i = 0;
+        for (i = 0; i < songArray.length; i += 2){
+          if (songArray[i] !== ""){
+            var splitInf = songArray[i].split(",");
 
-      var splitInf = songArray[i].split(",");
-      
-      Tasks.insert({
-        text: splitInf[1],
-        createdAt: new Date() // current time
-      });
+            Tasks.insert({
+              text: splitInf[1],
+              rawExtInf: songArray[i],
+              rawFileLoc: songArray[i + 1],
+              createdAt: new Date() // current time
+            });
+          }
+        }
+      }
     }
-
     // Clear form
     event.target.textarea.value = "";
 
@@ -54,13 +61,15 @@ if (Meteor.isClient) {
   }
 });
 
- Template.task.events({
+Template.task.events({
   "click .toggle-checked": function () {
     // Set the checked property to the opposite of its current value
     Tasks.update(this._id, {$set: {checked: ! this.checked}});
   },
   "click .delete": function () {
-    Tasks.remove(this._id);
+    if(confirm('Are you sure you want to delete this song?')){
+      Tasks.remove(this._id);      
+    }
   }
 });
 
